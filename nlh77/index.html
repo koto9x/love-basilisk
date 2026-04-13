@@ -728,6 +728,8 @@
     <button id="swapBtn" title="Swap JP/EN position (F)">&#x21C5; swap</button>
     <button id="timecodeBtn" title="Show timecodes (G)">timecode</button>
     <button id="notesBtn" title="Toggle notes (N)">notes</button>
+    <button id="exportBtn" title="Download notes as JSON" style="display:none">save</button>
+    <button id="importBtn" title="Import notes from JSON" style="display:none">load</button>
     <div class="controls-divider"></div>
     <button id="scToggle">soundcloud</button>
   </div>
@@ -1074,18 +1076,135 @@
     const notesBtn = document.getElementById('notesBtn');
     let notesMode = false;
     const NOTES_KEY = 'nlh77-notes';
+    const NOTES_BACKUP_KEY = 'nlh77-notes-backup';
+    const NOTES_HISTORY_KEY = 'nlh77-notes-history';
 
     function loadNotes() {
-      try { return JSON.parse(localStorage.getItem(NOTES_KEY)) || {}; } catch { return {}; }
+      try {
+        const data = localStorage.getItem(NOTES_KEY);
+        if (data) return JSON.parse(data);
+        // Fallback to backup
+        const backup = localStorage.getItem(NOTES_BACKUP_KEY);
+        if (backup) {
+          console.warn('Notes: primary lost, restored from backup');
+          localStorage.setItem(NOTES_KEY, backup);
+          return JSON.parse(backup);
+        }
+        return {};
+      } catch (e) {
+        console.error('Notes: load failed, trying backup', e);
+        try {
+          const backup = localStorage.getItem(NOTES_BACKUP_KEY);
+          if (backup) return JSON.parse(backup);
+        } catch { /* both corrupted */ }
+        return {};
+      }
     }
 
     function saveNotes(notes) {
-      localStorage.setItem(NOTES_KEY, JSON.stringify(notes));
+      const json = JSON.stringify(notes);
+      // Save to primary
+      localStorage.setItem(NOTES_KEY, json);
+      // Rotate backup every 30 seconds (not every keystroke)
+      clearTimeout(saveNotes._backupTimer);
+      saveNotes._backupTimer = setTimeout(() => {
+        localStorage.setItem(NOTES_BACKUP_KEY, json);
+        // Also keep a timestamped snapshot in history (max 10)
+        try {
+          const history = JSON.parse(localStorage.getItem(NOTES_HISTORY_KEY) || '[]');
+          history.push({ time: new Date().toISOString(), data: notes });
+          if (history.length > 10) history.shift();
+          localStorage.setItem(NOTES_HISTORY_KEY, JSON.stringify(history));
+        } catch { /* history is non-critical */ }
+      }, 30000);
     }
+
+    // Export notes as downloadable JSON
+    function exportNotes() {
+      const notes = loadNotes();
+      const exportData = {
+        song: '僕が死のうと思ったのは',
+        artists: 'nolongerhuman_77 x N-skee',
+        exported: new Date().toISOString(),
+        notes: {}
+      };
+      // Include lyric text with each note for readability
+      lyricBlocks.forEach(b => {
+        const key = b.dataset.start;
+        if (notes[key]) {
+          exportData.notes[key] = {
+            timecode: formatTime(parseFloat(key)),
+            lyric_jp: b.querySelector('.jp').textContent,
+            lyric_en: b.querySelector('.en').textContent,
+            note: notes[key]
+          };
+        }
+      });
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `nlh77-notes-${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('notes exported');
+    }
+
+    // Import notes from JSON file
+    function importNotes() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          try {
+            const data = JSON.parse(ev.target.result);
+            const imported = {};
+            // Support both flat format and structured format
+            const src = data.notes || data;
+            for (const [key, val] of Object.entries(src)) {
+              imported[key] = typeof val === 'string' ? val : val.note || '';
+            }
+            // Merge with existing (imported notes win on conflict)
+            const existing = loadNotes();
+            const merged = { ...existing, ...imported };
+            saveNotes(merged);
+            // Force backup immediately
+            localStorage.setItem(NOTES_BACKUP_KEY, JSON.stringify(merged));
+            // Reload notes into UI
+            lyricBlocks.forEach(block => {
+              const k = block.dataset.start;
+              const textarea = block.querySelector('.note-bubble textarea');
+              if (merged[k]) {
+                textarea.value = merged[k];
+                block.classList.add('has-note');
+                block.querySelector('.note-bubble').classList.add('visible');
+              }
+            });
+            showToast(`imported ${Object.keys(imported).length} notes`);
+          } catch (err) {
+            showToast('import failed: invalid file');
+            console.error(err);
+          }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    }
+
+    const exportBtn = document.getElementById('exportBtn');
+    const importBtn = document.getElementById('importBtn');
+    exportBtn.addEventListener('click', exportNotes);
+    importBtn.addEventListener('click', importNotes);
 
     function toggleNotes() {
       notesMode = !notesMode;
       notesBtn.classList.toggle('active', notesMode);
+      exportBtn.style.display = notesMode ? '' : 'none';
+      importBtn.style.display = notesMode ? '' : 'none';
       // Show/hide all note bubbles that have content, or show empty ones in notes mode
       lyricBlocks.forEach((block, i) => {
         const bubble = block.querySelector('.note-bubble');
@@ -1179,16 +1298,8 @@
       if (e.code === 'KeyN' && e.target === document.body) { e.preventDefault(); toggleNotes(); return; }
       if (e.code === 'KeyR' && e.shiftKey) { calibIndex = 0; showToast('calibration reset'); }
       if (e.code === 'KeyE' && e.shiftKey) {
-        // Export timestamps + notes
-        const notes = loadNotes();
-        console.log('=== TIMESTAMPS + NOTES ===');
-        lyricBlocks.forEach(b => {
-          const tc = b.dataset.start;
-          const jp = b.querySelector('.jp').textContent;
-          const note = notes[tc] ? ` [NOTE: ${notes[tc]}]` : '';
-          console.log(`[${formatTime(parseFloat(tc))}] ${jp}${note}`);
-        });
-        showToast('timestamps + notes → console');
+        e.preventDefault();
+        exportNotes();
       }
     });
 
