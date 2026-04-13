@@ -1245,6 +1245,50 @@
 
     // === Sync ===
     let lastActive = -1;
+    let autoScroll = true;
+    let userScrollTimeout;
+
+    // Detect manual scrolling — pause auto-scroll
+    window.addEventListener('scroll', () => {
+      if (!audio.paused) {
+        autoScroll = false;
+        syncBtn.classList.add('visible');
+        clearTimeout(userScrollTimeout);
+      }
+    }, { passive: true });
+
+    // Sync button — jump back to current line
+    const syncBtn = document.createElement('button');
+    syncBtn.id = 'syncBtn';
+    syncBtn.textContent = 'sync';
+    syncBtn.style.cssText = `
+      position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 200;
+      font-family: 'Space Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 0.5rem 1rem; border-radius: 50px;
+      border: 1px solid var(--accent-dim); background: var(--bg-elevated);
+      color: var(--accent); cursor: pointer;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.25s, background 0.2s;
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    `;
+    document.body.appendChild(syncBtn);
+
+    // Style for visible state
+    const syncStyle = document.createElement('style');
+    syncStyle.textContent = `
+      #syncBtn.visible { opacity: 1; pointer-events: auto; }
+      #syncBtn:hover { background: var(--accent); color: var(--btn-hover-text); }
+    `;
+    document.head.appendChild(syncStyle);
+
+    syncBtn.addEventListener('click', () => {
+      autoScroll = true;
+      syncBtn.classList.remove('visible');
+      if (lastActive >= 0) {
+        lyricBlocks[lastActive].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
 
     function syncLyrics() {
       const t = audio.currentTime;
@@ -1262,21 +1306,27 @@
           if (i === idx) b.classList.add('active');
           else if (i < idx) b.classList.add('past');
         });
-        if (idx >= 0) lyricBlocks[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (idx >= 0 && autoScroll) {
+          lyricBlocks[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
         lastActive = idx;
       }
 
       if (!audio.paused) requestAnimationFrame(syncLyrics);
     }
 
-    audio.addEventListener('play', () => requestAnimationFrame(syncLyrics));
-    audio.addEventListener('seeked', () => { lastActive = -1; syncLyrics(); });
-    audio.addEventListener('ended', () => { updatePlayState(); lyricBlocks.forEach(b => b.classList.remove('active', 'past')); lastActive = -1; });
+    audio.addEventListener('play', () => { autoScroll = true; syncBtn.classList.remove('visible'); requestAnimationFrame(syncLyrics); });
+    audio.addEventListener('seeked', () => { lastActive = -1; autoScroll = true; syncBtn.classList.remove('visible'); syncLyrics(); });
+    audio.addEventListener('ended', () => { updatePlayState(); lyricBlocks.forEach(b => b.classList.remove('active', 'past')); lastActive = -1; autoScroll = true; syncBtn.classList.remove('visible'); });
 
     lyricBlocks.forEach(b => {
-      b.addEventListener('click', () => {
+      b.addEventListener('click', (e) => {
+        // Don't seek if clicking inside a note textarea
+        if (e.target.matches('textarea, button')) return;
         if (!audio.duration) return;
         audio.currentTime = getStart(b);
+        autoScroll = true;
+        syncBtn.classList.remove('visible');
         if (audio.paused) togglePlay();
       });
     });
