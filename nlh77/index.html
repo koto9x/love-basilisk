@@ -472,6 +472,36 @@
     }
     body.hide-japanese .lyric-block.active .romaji { color: var(--text); }
 
+    /* Swapped mode — English on top, kanji on bottom */
+    body.swapped .lyric-block {
+      display: flex;
+      flex-direction: column;
+    }
+    body.swapped .lyric-block .en {
+      order: -2;
+      font-size: 1.1rem;
+      font-style: normal;
+      font-weight: 400;
+      color: var(--text-dim);
+      margin-top: 0;
+      margin-bottom: 0.08rem;
+    }
+    body.swapped .lyric-block .romaji { order: -1; }
+    body.swapped .lyric-block .jp {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      order: 1;
+      margin-top: 0.1rem;
+    }
+    body.swapped .lyric-block.active .en {
+      color: var(--text);
+      text-shadow: 0 0 40px var(--glow-strong);
+    }
+    body.swapped .lyric-block.active .jp {
+      color: var(--text-dim);
+      text-shadow: none;
+    }
+
     /* SoundCloud embed */
     .sc-embed {
       max-width: 700px;
@@ -552,7 +582,7 @@
     <div class="collab-label">nolongerhuman77 &times; n.skee</div>
     <div class="title-jp">僕が死のうと思ったのは</div>
     <div class="title-romaji">Boku ga Shinou to Omotta no wa</div>
-    <div class="title-en">The Reason Why I Thought I'd Die</div>
+    <div class="title-en">The Reason I Thought About Dying</div>
     <p class="artists"><span>nolongerhuman77</span> &middot; prod. <span>n.skee</span></p>
     <p class="original-credit">original by Mika Nakashima (中島美嘉) &middot; written by amazarashi</p>
 
@@ -590,6 +620,7 @@
     <button class="active" data-lang="romaji">romaji</button>
     <button class="active" data-lang="english">english</button>
     <div class="controls-divider"></div>
+    <button id="swapBtn" title="Swap JP/EN position (keyboard: F)">&#x21C5; swap</button>
     <button id="scToggle">soundcloud</button>
   </div>
 
@@ -608,17 +639,17 @@
       <div class="lyric-block" data-start="0">
         <div class="jp">僕が死のうと思ったのは</div>
         <div class="romaji">Boku ga shinou to omotta no wa</div>
-        <div class="en">The reason why I thought I'd die</div>
+        <div class="en">The reason I thought about dying</div>
       </div>
       <div class="lyric-block" data-start="5">
         <div class="jp">桟橋で海猫が泣いたから</div>
         <div class="romaji">Sanbashi de umineko ga naita kara</div>
-        <div class="en">Was because the seagulls cried at the pier</div>
+        <div class="en">Was because the umineko cried at the pier</div>
       </div>
       <div class="lyric-block" data-start="10">
         <div class="jp">波間をたゆたいながら</div>
         <div class="romaji">Namima wo tayutai nagara</div>
-        <div class="en">Drifting along the waves</div>
+        <div class="en">Drifting between the waves</div>
       </div>
       <div class="lyric-block" data-start="15">
         <div class="jp">過去をついばんで飛んでいった</div>
@@ -634,17 +665,17 @@
       <div class="lyric-block" data-start="22">
         <div class="jp">僕が死のうと思ったのは</div>
         <div class="romaji">Boku ga shinou to omotta no wa</div>
-        <div class="en">The reason why I thought I'd die</div>
+        <div class="en">The reason I thought about dying</div>
       </div>
       <div class="lyric-block" data-start="27">
         <div class="jp">誕生日に杏の花が咲いたから</div>
         <div class="romaji">Tanjoubi ni anzu no hana ga saita kara</div>
-        <div class="en">Was because the apricot blossoms bloomed on my birthday</div>
+        <div class="en">Was because apricot blossoms bloomed on my birthday</div>
       </div>
       <div class="lyric-block" data-start="33">
         <div class="jp">木漏れ日の中でうたた寝したら</div>
         <div class="romaji">Komorebi no naka de utatane shitara</div>
-        <div class="en">If I dozed off in the light filtering through leaves</div>
+        <div class="en">If I dozed off in the komorebi</div>
       </div>
       <div class="lyric-block" data-start="38">
         <div class="jp">死んだ虫みたいに土に帰れるかな</div>
@@ -660,22 +691,22 @@
       <div class="lyric-block" data-start="45">
         <div class="jp">僕が死のうと思ったのは</div>
         <div class="romaji">Boku ga shinou to omotta no wa</div>
-        <div class="en">The reason why I thought I'd die</div>
+        <div class="en">The reason I thought about dying</div>
       </div>
       <div class="lyric-block" data-start="50">
         <div class="jp">まだ関われない人がいたから</div>
         <div class="romaji">Mada kakawarenai hito ga ita kara</div>
-        <div class="en">Was because there were people I still couldn't connect with</div>
+        <div class="en">Was because there were still people I couldn't reach</div>
       </div>
       <div class="lyric-block" data-start="55">
         <div class="jp">優しい人が好きで</div>
         <div class="romaji">Yasashii hito ga suki de</div>
-        <div class="en">I liked kind people</div>
+        <div class="en">I loved kind people</div>
       </div>
       <div class="lyric-block" data-start="59">
         <div class="jp">でもそうじゃない自分を隠してた</div>
         <div class="romaji">Demo sou ja nai jibun wo kakushiteta</div>
-        <div class="en">But I was hiding my unkind self</div>
+        <div class="en">But I hid the part of me that wasn't</div>
       </div>
     </section>
 
@@ -686,7 +717,7 @@
       <div class="lyric-block" data-start="66">
         <div class="jp">僕が死のうと思ったのは</div>
         <div class="romaji">Boku ga shinou to omotta no wa</div>
-        <div class="en">The reason why I thought I'd die</div>
+        <div class="en">The reason I thought about dying</div>
       </div>
       <div class="lyric-block" data-start="71">
         <div class="jp">まだあなたに出会ってなかったから</div>
@@ -701,7 +732,7 @@
       <div class="lyric-block" data-start="81">
         <div class="jp">生き甲斐にしてもいいですか</div>
         <div class="romaji">Ikigai ni shitemo ii desu ka</div>
-        <div class="en">May I make them my reason to live?</div>
+        <div class="en">Can I make them my ikigai?</div>
       </div>
     </section>
 
@@ -712,22 +743,22 @@
       <div class="lyric-block" data-start="88">
         <div class="jp">夏の匂い 星のまたたき</div>
         <div class="romaji">Natsu no nioi hoshi no matataki</div>
-        <div class="en">The scent of summer, the twinkling of stars</div>
+        <div class="en">The smell of summer, the twinkling of stars</div>
       </div>
       <div class="lyric-block" data-start="93">
         <div class="jp">宇宙の広さ 雨の冷たさ</div>
         <div class="romaji">Uchuu no hirosa ame no tsumetasa</div>
-        <div class="en">The vastness of space, the coldness of rain</div>
+        <div class="en">The vastness of the universe, the coldness of rain</div>
       </div>
       <div class="lyric-block" data-start="98">
         <div class="jp">気にも留めなかったもの</div>
         <div class="romaji">Ki ni mo tomenakatta mono</div>
-        <div class="en">Things I never even noticed</div>
+        <div class="en">Things I never paid any mind</div>
       </div>
       <div class="lyric-block" data-start="102">
         <div class="jp">気にも留めないもの</div>
         <div class="romaji">Ki ni mo tomenai mono</div>
-        <div class="en">Things I still don't notice</div>
+        <div class="en">Things I still don't pay any mind</div>
       </div>
     </section>
 
@@ -738,7 +769,7 @@
       <div class="lyric-block" data-start="108">
         <div class="jp">僕が今日もまだ生きてるのは</div>
         <div class="romaji">Boku ga kyou mo mada ikiteru no wa</div>
-        <div class="en">The reason I'm still alive today</div>
+        <div class="en">That I'm still alive today</div>
       </div>
       <div class="lyric-block" data-start="113">
         <div class="jp">多分あなたのおかげです</div>
@@ -748,12 +779,12 @@
       <div class="lyric-block" data-start="118">
         <div class="jp">朝目を覚ますのが怖いのは</div>
         <div class="romaji">Asa me wo samasu no ga kowai no wa</div>
-        <div class="en">The reason I'm afraid to wake up in the morning</div>
+        <div class="en">That I'm afraid to open my eyes each morning</div>
       </div>
       <div class="lyric-block" data-start="123">
         <div class="jp">きっとあなたのせいです</div>
         <div class="romaji">Kitto anata no sei desu</div>
-        <div class="en">Is surely because of you</div>
+        <div class="en">Is surely your fault</div>
       </div>
     </section>
 
@@ -764,17 +795,17 @@
       <div class="lyric-block" data-start="130">
         <div class="jp">この世界に関われないなら</div>
         <div class="romaji">Kono sekai ni kakawarenai nara</div>
-        <div class="en">If I can't connect with this world</div>
+        <div class="en">If I can't belong to this world</div>
       </div>
       <div class="lyric-block" data-start="135">
         <div class="jp">せめて一人でもいい</div>
         <div class="romaji">Semete hitori demo ii</div>
-        <div class="en">At least one person is enough</div>
+        <div class="en">Then even just one person is enough</div>
       </div>
       <div class="lyric-block" data-start="139">
         <div class="jp">この世界にあなたがいること</div>
         <div class="romaji">Kono sekai ni anata ga iru koto</div>
-        <div class="en">The fact that you exist in this world</div>
+        <div class="en">That you exist in this world</div>
       </div>
       <div class="lyric-block" data-start="144">
         <div class="jp">それだけで良かった</div>
@@ -790,7 +821,7 @@
       <div class="lyric-block" data-start="152">
         <div class="jp">僕が今日もまだ生きてるのは</div>
         <div class="romaji">Boku ga kyou mo mada ikiteru no wa</div>
-        <div class="en">The reason I'm still alive today</div>
+        <div class="en">That I'm still alive today</div>
       </div>
       <div class="lyric-block" data-start="158">
         <div class="jp">あなたのおかげです</div>
@@ -900,6 +931,14 @@
       });
     });
 
+    // === Swap JP/EN position ===
+    const swapBtn = document.getElementById('swapBtn');
+    function toggleSwap() {
+      document.body.classList.toggle('swapped');
+      swapBtn.classList.toggle('active');
+    }
+    swapBtn.addEventListener('click', toggleSwap);
+
     // === Keyboard ===
     let calibIndex = 0, calibTimeout;
 
@@ -926,6 +965,7 @@
           calibIndex++;
         }
       }
+      if (e.code === 'KeyF' && e.target === document.body) { e.preventDefault(); toggleSwap(); return; }
       if (e.code === 'KeyR' && e.shiftKey) { calibIndex = 0; showToast('calibration reset'); }
       if (e.code === 'KeyE' && e.shiftKey) {
         console.log('=== TIMESTAMPS ===');
