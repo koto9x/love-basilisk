@@ -594,8 +594,8 @@
 
     <div class="stem-selector">
       <button class="stem-btn active" data-stem="instrumental">instrumental</button>
-      <button class="stem-btn coming-soon" data-stem="vocals">vocals (soon)</button>
-      <button class="stem-btn coming-soon" data-stem="full">full mix (soon)</button>
+      <button class="stem-btn" data-stem="vocals">vocals (ref)</button>
+      <button class="stem-btn coming-soon" data-stem="nlh-vocals">nlh vocals (soon)</button>
     </div>
   </section>
 
@@ -631,6 +631,7 @@
   <div class="calibration-toast" id="calibToast"></div>
 
   <audio id="audio" preload="auto" src="instrumental.mp3"></audio>
+  <audio id="vocalsAudio" preload="auto" src="vocals-reference.mp3"></audio>
 
   <main class="lyrics-container" id="lyrics">
 
@@ -894,21 +895,53 @@
       document.getElementById('heroPlayText').textContent = playing ? 'Pause' : 'Play';
     }
 
+    // === Vocals reference layer ===
+    const vocalsAudio = document.getElementById('vocalsAudio');
+    let vocalsEnabled = false;
+
     function togglePlay() {
-      if (audio.paused) audio.play();
-      else audio.pause();
+      if (audio.paused) {
+        audio.play();
+        if (vocalsEnabled) {
+          vocalsAudio.currentTime = audio.currentTime;
+          vocalsAudio.play();
+        }
+      } else {
+        audio.pause();
+        vocalsAudio.pause();
+      }
       updatePlayState();
     }
 
     playBtn.addEventListener('click', togglePlay);
     heroPlayBtn.addEventListener('click', togglePlay);
 
+    // Keep vocals synced on seek
+    audio.addEventListener('seeked', () => {
+      if (vocalsEnabled) vocalsAudio.currentTime = audio.currentTime;
+    });
+
     // === Stem selector ===
+    const stemLabel = document.querySelector('.player-title span');
     document.querySelectorAll('.stem-btn:not(.coming-soon)').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.stem-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        // When stems are added, switch audio.src here
+        const stem = btn.dataset.stem;
+
+        if (stem === 'vocals') {
+          // Toggle vocals layer on/off (additive, not exclusive)
+          btn.classList.toggle('active');
+          vocalsEnabled = btn.classList.contains('active');
+          if (vocalsEnabled && !audio.paused) {
+            vocalsAudio.currentTime = audio.currentTime;
+            vocalsAudio.play();
+          } else {
+            vocalsAudio.pause();
+          }
+          stemLabel.textContent = vocalsEnabled ? 'instrumental + vocals (ref)' : 'instrumental';
+        } else if (stem === 'instrumental') {
+          // Instrumental is always on — this button is just visual
+          btn.classList.add('active');
+        }
       });
     });
 
