@@ -1518,17 +1518,18 @@
     // Sync button — jump back to current line
     const syncBtn = document.createElement('button');
     syncBtn.id = 'syncBtn';
-    syncBtn.textContent = 'sync';
+    syncBtn.innerHTML = '&#x2193; sync';
     syncBtn.style.cssText = `
-      position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 200;
-      font-family: 'Space Mono', monospace; font-size: 0.6rem;
+      position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); z-index: 200;
+      font-family: 'Space Mono', monospace; font-size: 0.65rem;
       letter-spacing: 0.1em; text-transform: uppercase;
-      padding: 0.5rem 1rem; border-radius: 50px;
-      border: 1px solid var(--accent-dim); background: var(--bg-elevated);
+      padding: 0.6rem 1.5rem; border-radius: 50px;
+      border: 1.5px solid var(--accent); background: var(--bg-elevated);
       color: var(--accent); cursor: pointer;
       opacity: 0; pointer-events: none;
-      transition: opacity 0.25s, background 0.2s;
-      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      transition: opacity 0.3s, background 0.2s, transform 0.3s;
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
     `;
     document.body.appendChild(syncBtn);
 
