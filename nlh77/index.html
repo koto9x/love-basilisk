@@ -17,15 +17,16 @@
       --border: #dddde2;
       --border-light: #d0d0d8;
       --text: #1a1a1e;
-      --text-dim: #6b6b72;
-      --text-muted: #a0a0a8;
-      --accent: #5a6880;
-      --accent-soft: #7882a0;
+      --text-dim: #9a9aa0;
+      --text-muted: #c8c8ce;
+      --accent: #3a5080;
+      --accent-soft: #5a6a90;
       --accent-dim: #b0b8cc;
-      --romaji: #6878a0;
-      --english: #9a9aa2;
-      --glow: rgba(90, 104, 128, 0.04);
-      --glow-strong: rgba(90, 104, 128, 0.08);
+      --romaji: #4a6898;
+      --english: #aaaaB0;
+      --glow: rgba(58, 80, 128, 0.06);
+      --glow-strong: rgba(58, 80, 128, 0.12);
+      --active-highlight: #1a1a1e;
       --player-bg: rgba(250, 250, 250, 0.92);
       --btn-hover-text: #fafafa;
     }
@@ -39,6 +40,7 @@
       --border-light: #252530;
       --text: #e8e4e0;
       --text-dim: #6b6570;
+      --active-highlight: #e8e4e0;
       --text-muted: #3d3840;
       --accent: #b8c4e0;
       --accent-soft: #8892aa;
@@ -448,12 +450,16 @@
       transition: color 0.4s;
     }
 
+    .lyric-block.active {
+      padding-left: 0.75rem;
+      border-left: 2px solid var(--accent);
+    }
     .lyric-block.active .jp {
-      color: var(--text);
-      text-shadow: 0 0 40px var(--glow-strong);
+      color: var(--active-highlight);
+      text-shadow: none;
     }
     .lyric-block.active .romaji { opacity: 1; color: var(--accent); }
-    .lyric-block.active .en { color: var(--text-dim); }
+    .lyric-block.active .en { color: var(--accent-soft); font-style: normal; }
 
     .lyric-block.past .jp { color: var(--text-muted); }
     .lyric-block.past .romaji { opacity: 0.25; }
@@ -630,8 +636,8 @@
 
   <div class="calibration-toast" id="calibToast"></div>
 
-  <audio id="audio" preload="auto" src="instrumental.mp3"></audio>
-  <audio id="vocalsAudio" preload="auto" src="vocals-reference.mp3"></audio>
+  <audio id="audio" preload="auto" src="/nlh77/instrumental.mp3"></audio>
+  <audio id="vocalsAudio" preload="auto" src="/nlh77/vocals-reference.mp3"></audio>
 
   <main class="lyrics-container" id="lyrics">
 
