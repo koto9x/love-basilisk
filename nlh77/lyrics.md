@@ -1,6 +1,8 @@
 # 僕が死のうと思ったのは
 ## Boku ga Shinou to Omotta no wa
-### The Reason Why I Thought I'd Die
+### The Reason I Thought About Dying
+
+> **Status**: Instrumental lyrics are DRAFT — pending confirmation from NLH on verse selection for N-skee's 7:41 arrangement. The DAZBEE/original track on the site has the complete amazarashi lyrics (Whisper API synced) for reference. Verse 6 in the instrumental track (胸が裂けるほど恋をしたから — "I loved until my chest tore apart") is flagged as unconfirmed — not found in the full amazarashi version.
 
 **Original**: amazarashi (秋田ひろむ)
 **Performed by**: Mika Nakashima (中島美嘉)
