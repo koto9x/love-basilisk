@@ -413,6 +413,44 @@
       margin: 2.5rem auto;
     }
 
+    /* Color zone tints on lyrics */
+    body.show-zones .verse[data-zone="peach"] {
+      border-left: 3px solid #F0997B;
+      padding-left: 1rem;
+      background: linear-gradient(90deg, rgba(240,153,123,0.06) 0%, transparent 60%);
+    }
+    body.show-zones .verse[data-zone="red"] {
+      border-left: 3px solid #E24B4A;
+      padding-left: 1rem;
+      background: linear-gradient(90deg, rgba(226,75,74,0.06) 0%, transparent 60%);
+    }
+    body.show-zones .verse[data-zone="cyan"] {
+      border-left: 3px solid #5DCAA5;
+      padding-left: 1rem;
+      background: linear-gradient(90deg, rgba(93,202,165,0.06) 0%, transparent 60%);
+    }
+    body.show-zones .verse[data-zone="navy"] {
+      border-left: 3px solid #185FA5;
+      padding-left: 1rem;
+      background: linear-gradient(90deg, rgba(24,95,165,0.06) 0%, transparent 60%);
+    }
+    body.show-zones .verse[data-zone="grey"] {
+      border-left: 3px solid #B4B2A9;
+      padding-left: 1rem;
+      background: linear-gradient(90deg, rgba(180,178,169,0.04) 0%, transparent 60%);
+    }
+
+    body.show-zones .verse[data-zone] .verse-label::after {
+      font-size: 0.45rem;
+      opacity: 0.5;
+      margin-left: 0.5rem;
+    }
+    body.show-zones .verse[data-zone="peach"] .verse-label::after { content: 'beach'; color: #F0997B; }
+    body.show-zones .verse[data-zone="red"] .verse-label::after { content: 'city'; color: #E24B4A; }
+    body.show-zones .verse[data-zone="cyan"] .verse-label::after { content: 'room'; color: #5DCAA5; }
+    body.show-zones .verse[data-zone="navy"] .verse-label::after { content: 'pivot'; color: #185FA5; }
+    body.show-zones .verse[data-zone="grey"] .verse-label::after { content: 'transition'; color: #B4B2A9; }
+
     /* Lyric block */
     .lyric-block {
       margin-bottom: 1.1rem;
@@ -928,7 +966,7 @@
 
   <div class="sc-embed" id="scEmbed"></div>
 
-  <button id="syncBtn" style="position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);z-index:9999;font-size:0.7rem;padding:0.4rem 0.9rem;border-radius:50px;border:1px solid var(--accent);background:var(--bg);color:var(--accent);cursor:pointer;opacity:0;pointer-events:none;line-height:1;">&#x2193;</button>
+  <button id="syncBtn" style="position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);z-index:9999;font-family:'Space Mono',monospace;font-size:0.55rem;letter-spacing:0.1em;padding:0.4rem 0.9rem;border-radius:50px;border:1px solid var(--accent);background:var(--bg);color:var(--accent);cursor:pointer;opacity:0;pointer-events:none;">&#x21C5;</button>
   <div class="calibration-toast" id="calibToast"></div>
 
   <audio id="audio" preload="auto" src="original.mp3"></audio>
@@ -1295,7 +1333,7 @@
 
     <div id="lyrics-original">
 
-    <section class="verse">
+    <section class="verse" data-zone="peach">
       <div class="verse-label">Verse 1 — Pier</div>
       <div class="lyric-block" data-start="23.5">
         <div class="jp">僕が死のうと思ったのは</div>
@@ -1321,7 +1359,7 @@
 
     <div class="verse-divider"></div>
 
-    <section class="verse">
+    <section class="verse" data-zone="peach">
       <div class="verse-label">Verse 2 — Apricot Blossoms</div>
       <div class="lyric-block" data-start="46">
         <div class="jp">僕が死のうと思ったのは</div>
@@ -1347,7 +1385,7 @@
 
     <div class="verse-divider"></div>
 
-    <section class="verse">
+    <section class="verse" data-zone="peach">
       <div class="verse-label">Verse 3 — Peppermint Rain</div>
       <div class="lyric-block" data-start="69.5">
         <div class="jp">はっか雨 虚構の灯台</div>
@@ -1388,7 +1426,7 @@
 
     <div class="verse-divider"></div>
 
-    <section class="verse">
+    <section class="verse" data-zone="grey">
       <div class="verse-label">Verse 4 — Empty Heart</div>
       <div class="lyric-block" data-start="94.4">
         <div class="jp">僕が死のうと思ったのは</div>
@@ -1414,7 +1452,7 @@
 
     <div class="verse-divider"></div>
 
-    <section class="verse">
+    <section class="verse" data-zone="red">
       <div class="verse-label">Verse 5 — Shoelaces</div>
       <div class="lyric-block" data-start="128.7">
         <div class="jp">僕が死のうと思ったのは</div>
@@ -1440,7 +1478,7 @@
 
     <div class="verse-divider"></div>
 
-    <section class="verse">
+    <section class="verse" data-zone="red">
       <div class="verse-label">Verse 6 — The Boy</div>
       <div class="lyric-block" data-start="151.6">
         <div class="jp">僕が死のうと思ったのは</div>
@@ -1466,7 +1504,7 @@
 
     <div class="verse-divider"></div>
 
-    <section class="verse">
+    <section class="verse" data-zone="cyan">
       <div class="verse-label">Verse 7 — Birdcage</div>
       <div class="lyric-block" data-start="175.3">
         <div class="jp">パソコンの薄明かり</div>
@@ -1507,7 +1545,7 @@
 
     <div class="verse-divider"></div>
 
-    <section class="verse">
+    <section class="verse" data-zone="navy">
       <div class="verse-label">Verse 8 — Called Cold</div>
       <div class="lyric-block" data-start="200">
         <div class="jp">僕が死のうと思ったのは</div>
@@ -1533,7 +1571,7 @@
 
     <div class="verse-divider"></div>
 
-    <section class="verse">
+    <section class="verse" data-zone="navy">
       <div class="verse-label">Verse 9 — You Laugh Beautifully</div>
       <div class="lyric-block" data-start="223.2">
         <div class="jp">僕が死のうと思ったのは</div>
@@ -1559,7 +1597,7 @@
 
     <div class="verse-divider"></div>
 
-    <section class="verse">
+    <section class="verse" data-zone="navy">
       <div class="verse-label">Final Verse — A Little Hope</div>
       <div class="lyric-block" data-start="246.6">
         <div class="jp">僕が死のうと思ったのは</div>
@@ -1641,6 +1679,7 @@
     arcToggle.addEventListener('click', () => {
       arcToggle.classList.toggle('active');
       arcPanel.classList.toggle('visible');
+      document.body.classList.toggle('show-zones', arcPanel.classList.contains('visible'));
       if (arcPanel.classList.contains('visible') && !arcCanvas._drawn) {
         drawArc();
         arcCanvas._drawn = true;
