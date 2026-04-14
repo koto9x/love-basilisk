@@ -1648,8 +1648,14 @@
     });
 
     function drawArc() {
-      const ctx = arcCanvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
       const W = 680, H = 200;
+      arcCanvas.width = W * dpr;
+      arcCanvas.height = H * dpr;
+      arcCanvas.style.width = W + 'px';
+      arcCanvas.style.height = H + 'px';
+      const ctx = arcCanvas.getContext('2d');
+      ctx.scale(dpr, dpr);
 
       // Color zones (background bands)
       const zones = [
