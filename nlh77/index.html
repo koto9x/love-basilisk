@@ -2010,6 +2010,7 @@
       box-shadow: 0 4px 20px rgba(0,0,0,0.15);
     `;
     document.body.appendChild(syncBtn);
+    console.log('[init] syncBtn created and appended to body');
     const syncStyle = document.createElement('style');
     syncStyle.textContent = `
       #syncBtn.visible { opacity: 1; pointer-events: auto; }
@@ -2036,12 +2037,14 @@
 
     // Detect manual scrolling — pause auto-scroll
     window.addEventListener('scroll', () => {
+      console.log('[scroll]', { programmaticScroll, paused: audio.paused, autoScroll });
       if (programmaticScroll) return; // ignore our own scrollIntoView
       if (!audio.paused) {
         clearTimeout(scrollDebounce);
         scrollDebounce = setTimeout(() => {
           autoScroll = false;
           syncBtn.classList.add('visible');
+          console.log('[scroll] SYNC BUTTON SHOWN — autoScroll disabled');
         }, 50);
       }
     }, { passive: true });
@@ -2057,6 +2060,7 @@
       }
 
       if (idx !== lastActive) {
+        console.log('[sync] line changed:', idx, 'autoScroll:', autoScroll, 'blocks:', lyricBlocks.length);
         lyricBlocks.forEach((b, i) => {
           b.classList.remove('active', 'past');
           if (i === idx) b.classList.add('active');
@@ -2090,8 +2094,12 @@
     });
 
     // Initialize BOTH lyrics containers (timecodes, notes, click handlers)
-    initLyricBlocks(document.querySelectorAll('#lyrics-instrumental .lyric-block'));
-    initLyricBlocks(document.querySelectorAll('#lyrics-original .lyric-block'));
+    const instrBlocks = document.querySelectorAll('#lyrics-instrumental .lyric-block');
+    const origBlocks = document.querySelectorAll('#lyrics-original .lyric-block');
+    console.log('[init] instrumental blocks:', instrBlocks.length, 'original blocks:', origBlocks.length);
+    console.log('[init] active lyricBlocks:', lyricBlocks.length, 'currentStem:', currentStem);
+    initLyricBlocks(instrBlocks);
+    initLyricBlocks(origBlocks);
 
     // Fade-in
     const observer = new IntersectionObserver(entries => {
