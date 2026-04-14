@@ -748,8 +748,8 @@
     </button>
 
     <div class="stem-selector">
-      <button class="stem-btn active" data-stem="instrumental">instrumental</button>
-      <button class="stem-btn" data-stem="original">original (DAZBEE) — full lyrics</button>
+      <button class="stem-btn" data-stem="instrumental">instrumental</button>
+      <button class="stem-btn active" data-stem="original">original (DAZBEE) — full lyrics</button>
       <button class="stem-btn coming-soon" data-stem="vocals">vocals (soon)</button>
       <a class="stem-btn" href="instrumental.mp3" download="TRIWTD-instrumental-N-skee.mp3" style="text-decoration:none" id="downloadLink">&#x2193; download</a>
     </div>
@@ -762,7 +762,7 @@
         <svg id="pauseIcon" viewBox="0 0 24 24" fill="currentColor" style="display:none"><rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/></svg>
       </button>
       <div class="player-info">
-        <div class="player-title">僕が死のうと思ったのは <span style="font-family:'Space Mono';font-size:0.5rem;color:var(--text-muted)">instrumental</span></div>
+        <div class="player-title">僕が死のうと思ったのは <span style="font-family:'Space Mono';font-size:0.5rem;color:var(--text-muted)">original (DAZBEE)</span></div>
         <div class="player-time"><span id="currentTime">0:00</span> / <span id="totalTime">--:--</span></div>
       </div>
       <div class="progress-bar" id="progressBar">
@@ -791,12 +791,12 @@
 
   <div class="calibration-toast" id="calibToast"></div>
 
-  <audio id="audio" preload="auto" src="instrumental.mp3"></audio>
+  <audio id="audio" preload="auto" src="original.mp3"></audio>
   <!-- <audio id="vocalsAudio" preload="auto" src="/nlh77/vocals.mp3"></audio> -->
 
   <main class="lyrics-container" id="lyrics">
 
-    <div id="lyrics-instrumental">
+    <div id="lyrics-instrumental" style="display:none">
 
     <section class="verse">
       <div class="verse-label">Verse 1 — Pier</div>
@@ -1153,7 +1153,7 @@
 
     </div><!-- /lyrics-instrumental -->
 
-    <div id="lyrics-original" style="display:none">
+    <div id="lyrics-original">
 
     <section class="verse">
       <div class="verse-label">Verse 1 — Pier</div>
@@ -1510,7 +1510,7 @@
     const progressBar = document.getElementById('progressBar');
     const progressFill = document.getElementById('progressFill');
     const calibToast = document.getElementById('calibToast');
-    let lyricBlocks = document.querySelectorAll('#lyrics-instrumental .lyric-block');
+    let lyricBlocks = document.querySelectorAll('#lyrics-original .lyric-block');
 
     const TIMING_SCALE = 1.0;
     const TIMING_OFFSET = 0;
@@ -1553,7 +1553,7 @@
     };
     const stemLabel = document.querySelector('.player-title span');
     const downloadLink = document.getElementById('downloadLink');
-    let currentStem = 'instrumental';
+    let currentStem = 'original';
 
     // Initialize timecodes, notes, and click handlers for a set of lyric blocks
     function initLyricBlocks(blocks) {
@@ -2035,19 +2035,22 @@
     let programmaticScroll = false;
     let scrollDebounce;
 
-    // Detect manual scrolling — pause auto-scroll
-    window.addEventListener('scroll', () => {
-      console.log('[scroll]', { programmaticScroll, paused: audio.paused, autoScroll });
-      if (programmaticScroll) return; // ignore our own scrollIntoView
-      if (!audio.paused) {
-        clearTimeout(scrollDebounce);
-        scrollDebounce = setTimeout(() => {
-          autoScroll = false;
-          syncBtn.classList.add('visible');
-          console.log('[scroll] SYNC BUTTON SHOWN — autoScroll disabled');
-        }, 50);
+    // Check if active line is visible — show sync button if not
+    function checkSyncVisibility() {
+      if (audio.paused || lastActive < 0) return;
+      const el = lyricBlocks[lastActive];
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const visible = rect.top >= 0 && rect.bottom <= window.innerHeight;
+      if (!visible && autoScroll) {
+        // User scrolled away — disable auto-scroll, show sync
+        autoScroll = false;
+        syncBtn.classList.add('visible');
       }
-    }, { passive: true });
+    }
+
+    // Poll visibility instead of fighting with scroll events
+    setInterval(checkSyncVisibility, 500);
 
     function syncLyrics() {
       const t = audio.currentTime;
