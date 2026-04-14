@@ -1462,6 +1462,7 @@
       <h3>Keyboard Shortcuts</h3>
       <kbd>Space</kbd> play / pause<br>
       <kbd>&#x2190;</kbd> <kbd>&#x2192;</kbd> seek -3s / +3s<br>
+      <kbd>S</kbd> sync — jump to current line<br>
       <kbd>F</kbd> swap JP / EN position<br>
       <kbd>G</kbd> toggle timecodes<br>
       <kbd>N</kbd> toggle notes mode<br>
@@ -1945,6 +1946,13 @@
           showToast(`[${formatTime(audio.currentTime)}] line ${calibIndex + 1}/${lyricBlocks.length}`);
           calibIndex++;
         }
+      }
+      if (e.code === 'KeyS' && e.target === document.body) {
+        e.preventDefault();
+        autoScroll = true;
+        syncBtn.classList.remove('visible');
+        if (lastActive >= 0) lyricBlocks[lastActive].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
       }
       if (e.code === 'KeyF' && e.target === document.body) { e.preventDefault(); toggleSwap(); return; }
       if (e.code === 'KeyG' && e.target === document.body) { e.preventDefault(); toggleTimecodes(); return; }
