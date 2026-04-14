@@ -597,6 +597,37 @@
       font-size: 0.78rem;
       color: var(--text-muted);
       order: 1;
+
+    /* Romaji primary mode — romaji on top for singing */
+    body.romaji-primary .lyric-block {
+      display: flex;
+      flex-direction: column;
+    }
+    body.romaji-primary .lyric-block .romaji {
+      order: -2;
+      font-size: 1.15rem;
+      font-weight: 400;
+      opacity: 1;
+      color: var(--text-dim);
+      margin-top: 0;
+      margin-bottom: 0.1rem;
+      letter-spacing: 0.01em;
+    }
+    body.romaji-primary .lyric-block .jp {
+      order: -1;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    body.romaji-primary .lyric-block .en {
+      order: 1;
+      font-size: 0.65rem;
+    }
+    body.romaji-primary .lyric-block.active .romaji {
+      color: var(--active-highlight);
+    }
+    body.romaji-primary .lyric-block.active .jp {
+      color: var(--accent);
+      text-shadow: none;
       margin-top: 0.1rem;
     }
     body.swapped .lyric-block.active .en {
@@ -777,6 +808,7 @@
     <button class="active" data-lang="english">english</button>
     <div class="controls-divider"></div>
     <button id="swapBtn" title="Swap JP/EN position (F)">&#x21C5; swap</button>
+    <button id="romajiBtn" title="Romaji primary for singing (R)">romaji &#x2191;</button>
     <button id="timecodeBtn" title="Show timecodes (G)">timecode</button>
     <button id="notesBtn" title="Toggle notes (N)">notes</button>
     <button id="exportBtn" title="Download notes as JSON" style="display:none">save</button>
@@ -1463,6 +1495,7 @@
       <kbd>Space</kbd> play / pause<br>
       <kbd>&#x2190;</kbd> <kbd>&#x2192;</kbd> seek -3s / +3s<br>
       <kbd>S</kbd> sync — jump to current line<br>
+      <kbd>R</kbd> romaji primary (for singing)<br>
       <kbd>F</kbd> swap JP / EN position<br>
       <kbd>G</kbd> toggle timecodes<br>
       <kbd>N</kbd> toggle notes mode<br>
@@ -1691,13 +1724,36 @@
       });
     });
 
-    // === Swap JP/EN position ===
+    // === Layout modes: swap (EN top) and romaji primary ===
     const swapBtn = document.getElementById('swapBtn');
-    function toggleSwap() {
-      document.body.classList.toggle('swapped');
-      swapBtn.classList.toggle('active');
+    const romajiBtn = document.getElementById('romajiBtn');
+
+    function clearLayoutModes() {
+      document.body.classList.remove('swapped', 'romaji-primary');
+      swapBtn.classList.remove('active');
+      romajiBtn.classList.remove('active');
     }
+
+    function toggleSwap() {
+      const wasActive = document.body.classList.contains('swapped');
+      clearLayoutModes();
+      if (!wasActive) {
+        document.body.classList.add('swapped');
+        swapBtn.classList.add('active');
+      }
+    }
+
+    function toggleRomajiPrimary() {
+      const wasActive = document.body.classList.contains('romaji-primary');
+      clearLayoutModes();
+      if (!wasActive) {
+        document.body.classList.add('romaji-primary');
+        romajiBtn.classList.add('active');
+      }
+    }
+
     swapBtn.addEventListener('click', toggleSwap);
+    romajiBtn.addEventListener('click', toggleRomajiPrimary);
 
     // === Timecodes ===
     const timecodeBtn = document.getElementById('timecodeBtn');
@@ -1961,6 +2017,7 @@
         setTimeout(() => { programmaticScroll = false; }, 600);
         return;
       }
+      if (e.code === 'KeyR' && !e.shiftKey && e.target === document.body) { e.preventDefault(); toggleRomajiPrimary(); return; }
       if (e.code === 'KeyF' && e.target === document.body) { e.preventDefault(); toggleSwap(); return; }
       if (e.code === 'KeyG' && e.target === document.body) { e.preventDefault(); toggleTimecodes(); return; }
       if (e.code === 'KeyN' && e.target === document.body) { e.preventDefault(); toggleNotes(); return; }
